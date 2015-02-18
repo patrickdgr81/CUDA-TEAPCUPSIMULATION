@@ -9,8 +9,7 @@
 const int N = 16; 
 const int blocksize = 16; 
  
-__global__ 
-void hello(char *a, int *b) 
+__global__ void hello(char *a, int *b) 
 {
 	a[threadIdx.x] += b[threadIdx.x];
 }
@@ -18,8 +17,7 @@ void hello(char *a, int *b)
 int main()
 {
 	char a[N] = "Hello \0\0\0\0\0\0";
-	int b[N] = {15, 10, 6, 0, -11, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0};
+	int b[N] = {15, 10, 6, 0, -11, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
  
  char *ad;
  int *bd;
