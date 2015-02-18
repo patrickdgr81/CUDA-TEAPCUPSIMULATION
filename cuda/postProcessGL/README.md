@@ -2,6 +2,8 @@
 
 There are a few steps we have to take to make the samples from the
 CUDA toolkit portable (able to sit in any directory).
+These steps have already been applied to the example here, but 
+are useful as an example for any other sample program.
 
 1. Update the paths in the Makefile
    1. Add a line that says `CUDA_SAMPLE_PATH ?= /usr/local/cuda/samples`
