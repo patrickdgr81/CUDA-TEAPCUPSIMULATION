@@ -48,7 +48,7 @@ CUDA_SAMPLE_PATH ?= /usr/local/cuda/samples
 # 	rm -rf $(CUDA_SAMPLE_PATH)/bin/$(OS_ARCH)/$(OSLOWER)/$(TARGET)$(if $(abi),/$(abi))/postProcessGL
 
 # Location of the CUDA Toolkit
-CUDA_PATH       ?= /Developer/NVIDIA/CUDA-6.5
+CUDA_PATH       ?= /usr/local/cuda
 
 OSUPPER = $(shell uname -s 2>/dev/null | tr "[:lower:]" "[:upper:]")
 OSLOWER = $(shell uname -s 2>/dev/null | tr "[:upper:]" "[:lower:]")
