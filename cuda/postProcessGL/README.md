@@ -27,3 +27,8 @@ clean:
 	rm -f postProcessGL main.o postProcessGL.o
 	rm -rf $(CUDA_SAMPLE_PATH)/bin/$(OS_ARCH)/$(OSLOWER)/$(TARGET)$(if $(abi),/$(abi))/postProcessGL # delete this
 	```
+3. Make sure the CUDA path looks like this:
+	```
+# Location of the CUDA Toolkit
+CUDA_PATH       ?= /usr/local/cuda
+	```
