@@ -33,6 +33,20 @@
 #
 ################################################################################
 
+# Find and replace "../.." with $(CUDA_SAMPLE_PATH)
+CUDA_SAMPLE_PATH ?= /usr/local/cuda/samples
+
+# comment out the last 2 of the following lines at the bottom
+# postProcessGL: main.o postProcessGL.o
+# 	$(EXEC) $(NVCC) $(ALL_LDFLAGS) $(GENCODE_FLAGS) -o $@ $+ $(LIBRARIES)
+# 	$(EXEC) mkdir -p $(CUDA_SAMPLE_PATH)/bin/$(OS_ARCH)/$(OSLOWER)/$(TARGET)$(if $(abi),/$(abi))
+# 	$(EXEC) cp $@ $(CUDA_SAMPLE_PATH)/bin/$(OS_ARCH)/$(OSLOWER)/$(TARGET)$(if $(abi),/$(abi))
+
+# comment out the last of the following lines at the bottom
+# clean:
+# 	rm -f postProcessGL main.o postProcessGL.o
+# 	rm -rf $(CUDA_SAMPLE_PATH)/bin/$(OS_ARCH)/$(OSLOWER)/$(TARGET)$(if $(abi),/$(abi))/postProcessGL
+
 # Location of the CUDA Toolkit
 CUDA_PATH       ?= /Developer/NVIDIA/CUDA-6.5
 
@@ -144,7 +158,7 @@ ALL_LDFLAGS += $(addprefix -Xlinker ,$(LDFLAGS))
 ALL_LDFLAGS += $(addprefix -Xlinker ,$(EXTRA_LDFLAGS))
 
 # Common includes and paths for CUDA
-INCLUDES  := -I../../common/inc
+INCLUDES  := -I$(CUDA_SAMPLE_PATH)/common/inc
 LIBRARIES :=
 
 ################################################################################
@@ -158,10 +172,10 @@ include ./findgllib.mk
 ifneq ($(DARWIN),)
  # Mac OSX specific libraries and paths to include
  LIBRARIES += -L/System/Library/Frameworks/OpenGL.framework/Libraries
- LIBRARIES += -lGL -lGLU ../../common/lib/darwin/libGLEW.a
+ LIBRARIES += -lGL -lGLU $(CUDA_SAMPLE_PATH)/common/lib/darwin/libGLEW.a
  ALL_LDFLAGS += -Xlinker -framework -Xlinker GLUT
 else
- LIBRARIES += -L../../common/lib/$(OSLOWER)/$(OS_ARCH) $(GLLINK)
+ LIBRARIES += -L$(CUDA_SAMPLE_PATH)/common/lib/$(OSLOWER)/$(OS_ARCH) $(GLLINK)
  LIBRARIES += -lGL -lGLU -lX11 -lXi -lXmu -lglut -lGLEW
 endif
 
@@ -214,14 +228,14 @@ postProcessGL.o:postProcessGL.cu
 
 postProcessGL: main.o postProcessGL.o
 	$(EXEC) $(NVCC) $(ALL_LDFLAGS) $(GENCODE_FLAGS) -o $@ $+ $(LIBRARIES)
-	$(EXEC) mkdir -p ../../bin/$(OS_ARCH)/$(OSLOWER)/$(TARGET)$(if $(abi),/$(abi))
-	$(EXEC) cp $@ ../../bin/$(OS_ARCH)/$(OSLOWER)/$(TARGET)$(if $(abi),/$(abi))
+	# $(EXEC) mkdir -p $(CUDA_SAMPLE_PATH)/bin/$(OS_ARCH)/$(OSLOWER)/$(TARGET)$(if $(abi),/$(abi))
+	# $(EXEC) cp $@ $(CUDA_SAMPLE_PATH)/bin/$(OS_ARCH)/$(OSLOWER)/$(TARGET)$(if $(abi),/$(abi))
 
 run: build
 	$(EXEC) ./postProcessGL
 
 clean:
 	rm -f postProcessGL main.o postProcessGL.o
-	rm -rf ../../bin/$(OS_ARCH)/$(OSLOWER)/$(TARGET)$(if $(abi),/$(abi))/postProcessGL
+	# rm -rf $(CUDA_SAMPLE_PATH)/bin/$(OS_ARCH)/$(OSLOWER)/$(TARGET)$(if $(abi),/$(abi))/postProcessGL
 
 clobber: clean
