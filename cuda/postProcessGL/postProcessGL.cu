@@ -70,7 +70,7 @@ __device__ uchar4 getPixel(int x, int y)
       r    bw   r
     <----tilew---->
 */
-
+__device__ unsigned int *g_odataCopy = NULL;
 __global__ void
 cudaProcess(unsigned int *g_odata, int imgw, int imgh,
             int tilew, int r, float threshold, float highlight, int motionBlur)
@@ -174,7 +174,8 @@ cudaProcess(unsigned int *g_odata, int imgw, int imgh,
     gsum /= samples;
     bsum /= samples;
     // ABGR
-    g_odata[y*imgw+x] = rgbToInt(rsum, gsum, bsum);
+    g_odata[y*imgw+x] = rgbToInt(rsum, gsum, bsum)+motionBlur*g_odataCopy[y*imgw+x];
+    //g_odataCopy[y*imgw+x] = rgbToInt(rsum, gsum, bsum);
     //g_odata[y*imgw+x] = rgbToInt(x,y,0);
 #endif
 }
@@ -185,6 +186,13 @@ launch_cudaProcess(dim3 grid, dim3 block, int sbytes,
                    int imgw, int imgh, int tilew,
                    int radius, float threshold, float highlight, int motionBlur)
 {
+    if (!g_odataCopy) {
+    	const size_t sz = 512 * sizeof(unsigned int);
+    	unsigned int *g_odataTemp;
+    	cudaMalloc((void **)&g_odataTemp, sz);
+    	cudaMemcpyToSymbol("g_odataCopy", &g_odataTemp, sizeof(unsigned int *), 
+	size_t(0),cudaMemcpyHostToDevice);
+    }
     checkCudaErrors(cudaBindTextureToArray(inTex, g_data_array));
 
     struct cudaChannelFormatDesc desc;
