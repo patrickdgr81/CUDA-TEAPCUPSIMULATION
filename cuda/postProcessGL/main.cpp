@@ -121,6 +121,8 @@ bool enable_cuda     = true;
 bool animate         = true;
 int  blur_radius     = 8;
 int  max_blur_radius = 16;
+int motion_blur = 0;
+int max_motion_blur = 16;
 
 int   *pArgc = NULL;
 char **pArgv = NULL;
@@ -180,7 +182,7 @@ extern "C" void
 launch_cudaProcess(dim3 grid, dim3 block, int sbytes,
                    cudaArray *g_data, unsigned int *g_odata,
                    int imgw, int imgh, int tilew,
-                   int radius, float threshold, float highlight);
+                   int radius, float threshold, float highlight, int motionBlur);
 
 // Forward declarations
 void runStdProgram(int argc, char **argv);
@@ -214,7 +216,7 @@ void mainMenu(int i);
 ////////////////////////////////////////////////////////////////////////////////
 //! Run the Cuda part of the computation
 ////////////////////////////////////////////////////////////////////////////////
-void process(int width, int height, int radius)
+void process(int width, int height, int radius, int motionBlur)
 {
     cudaArray *in_array;
     unsigned int *out_data;
@@ -243,7 +245,7 @@ void process(int width, int height, int radius)
     // execute CUDA kernel
     launch_cudaProcess(grid, block, sbytes,
                        in_array, out_data, width, height,
-                       block.x+(2*radius), radius, 0.8f, 4.0f);
+                       block.x+(2*radius), radius, 0.8f, 4.0f, motionBlur);
 
     checkCudaErrors(cudaGraphicsUnmapResources(1, &cuda_tex_screen_resource, 0));
 #ifdef USE_TEXSUBIMAGE2D
@@ -371,7 +373,7 @@ void renderScene(bool colorScale)
 void processImage()
 {
     // run the Cuda kernel
-    process(image_width, image_height, blur_radius);
+  process(image_width, image_height, blur_radius, motion_blur);
 
     // CUDA generated data in cuda memory or in a mapped PBO made of BGRA 8 bits
     // 2 solutions, here :
@@ -603,6 +605,20 @@ keyboard(unsigned char key, int /*x*/, int /*y*/)
 
             printf("radius = %d\n", blur_radius);
             break;
+        case 'm':
+	  if (motion_blur < 16)
+	    {
+	      motion_blur++;
+	    }
+	  printf("motion_blur = %d\n", motion_blur);
+	  break;
+        case 'n':
+	  if (motion_blur > 0)
+	    {
+	      motion_blur--;
+	    }
+	  printf("motion_blur = %d\n", motion_blur);
+	  break;
     }
 }
 

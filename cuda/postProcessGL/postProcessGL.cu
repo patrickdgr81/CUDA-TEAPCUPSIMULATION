@@ -73,7 +73,7 @@ __device__ uchar4 getPixel(int x, int y)
 
 __global__ void
 cudaProcess(unsigned int *g_odata, int imgw, int imgh,
-            int tilew, int r, float threshold, float highlight)
+            int tilew, int r, float threshold, float highlight, int motionBlur)
 {
     extern __shared__ uchar4 sdata[];
 
@@ -183,7 +183,7 @@ extern "C" void
 launch_cudaProcess(dim3 grid, dim3 block, int sbytes,
                    cudaArray *g_data_array, unsigned int *g_odata,
                    int imgw, int imgh, int tilew,
-                   int radius, float threshold, float highlight)
+                   int radius, float threshold, float highlight, int motionBlur)
 {
     checkCudaErrors(cudaBindTextureToArray(inTex, g_data_array));
 
@@ -217,7 +217,7 @@ launch_cudaProcess(dim3 grid, dim3 block, int sbytes,
 #endif
 
         cudaProcess<<< grid, block, sbytes >>>(g_odata, imgw, imgh,
-                                               block.x+(2*radius), radius, 0.8f, 4.0f);
+                                               block.x+(2*radius), radius, 0.8f, 4.0f, motionBlur);
 
 #ifdef GPU_PROFILING
     }
