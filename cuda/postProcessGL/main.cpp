@@ -350,7 +350,7 @@ void renderScene(bool colorScale)
         glBindFragDataLocationEXT(shDrawPot, 0, "FragColor");
         SDK_CHECK_ERROR_GL();
     }
-
+    
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     glTranslatef(0.0, 0.0, -3.0);
@@ -363,8 +363,10 @@ void renderScene(bool colorScale)
     glEnable(GL_LIGHTING);
     glEnable(GL_DEPTH_TEST);
 
-    glutSolidTeapot(1.0);
-
+    glutSolidTeapot(0.5);
+    glTranslatef(1,1, -1.0);
+    glutSolidSphere(0.5);
+    
     if (colorScale)
     {
         glUseProgram(0);
