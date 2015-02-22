@@ -182,7 +182,7 @@ extern "C" void
 launch_cudaProcess(dim3 grid, dim3 block, int sbytes,
                    cudaArray *g_data, unsigned int *g_odata,
                    int imgw, int imgh, int tilew,
-                   int radius, float threshold, float highlight, int motionBlur);
+                   int radius, float threshold, float highlight, int motionBlur, unsigned int *g_odataCopy);
 
 // Forward declarations
 void runStdProgram(int argc, char **argv);
@@ -220,15 +220,19 @@ void process(int width, int height, int radius, int motionBlur)
 {
     cudaArray *in_array;
     unsigned int *out_data;
+    unsigned int *out_dataCopy;
 
 #ifdef USE_TEXSUBIMAGE2D
     checkCudaErrors(cudaGraphicsMapResources(1, &cuda_pbo_dest_resource, 0));
     size_t num_bytes;
     checkCudaErrors(cudaGraphicsResourceGetMappedPointer((void **)&out_data, &num_bytes,
                                                          cuda_pbo_dest_resource));
+    checkCudaErrors(cudaGraphicsResourceGetMappedPointer((void **)&out_dataCopy, &num_bytes,
+                                                         cuda_pbo_dest_resource));
     //printf("CUDA mapped pointer of pbo_out: May access %ld bytes, expected %d\n", num_bytes, size_tex_data);
 #else
     out_data = cuda_dest_resource;
+    out_dataCopy = cuda_dest_resource;
 #endif
 
     // map buffer objects to get CUDA device pointers
@@ -245,7 +249,7 @@ void process(int width, int height, int radius, int motionBlur)
     // execute CUDA kernel
     launch_cudaProcess(grid, block, sbytes,
                        in_array, out_data, width, height,
-                       block.x+(2*radius), radius, 0.8f, 4.0f, motionBlur);
+                       block.x+(2*radius), radius, 0.8f, 4.0f, motionBlur, out_dataCopy);
 
     checkCudaErrors(cudaGraphicsUnmapResources(1, &cuda_tex_screen_resource, 0));
 #ifdef USE_TEXSUBIMAGE2D
